@@ -43,6 +43,3 @@ private:
 
 } // namespace phi::runtime
 
-// Transition alias (6e-a): phi-core still says phicore::runtime everywhere;
-// the alias dies with 6d's string sweep.
-namespace phicore { namespace runtime = phi::runtime; }
