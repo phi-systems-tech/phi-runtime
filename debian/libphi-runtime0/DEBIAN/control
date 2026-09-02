@@ -1,0 +1,15 @@
+Package: libphi-runtime0
+Source: phi-runtime
+Version: 0.1.0-1
+Architecture: arm64
+Maintainer: Marius Schumacher <marius.schumacher@phisys.com>
+Installed-Size: 80
+Depends: libc6 (>= 2.34), libgcc-s1 (>= 3.0), libstdc++6 (>= 12)
+Section: libs
+Priority: optional
+Homepage: https://github.com/phi-systems-tech/phi-runtime
+Description: PHI runtime library
+ The event loop the phi daemons and their plugins share: epoll-driven
+ loops, loop-owning threads, cross-thread posts and bounded queues.
+ One dynamic library on purpose, so a Loop reference handed across a
+ plugin boundary means the same loop state on every side.

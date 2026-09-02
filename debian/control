@@ -1,0 +1,24 @@
+Source: phi-runtime
+Section: libs
+Priority: optional
+Maintainer: Marius Schumacher <marius.schumacher@phisys.com>
+Build-Depends: debhelper-compat (= 13), cmake
+Standards-Version: 4.7.0
+Rules-Requires-Root: no
+Homepage: https://github.com/phi-systems-tech/phi-runtime
+
+Package: libphi-runtime0
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: PHI runtime library
+ The event loop the phi daemons and their plugins share: epoll-driven
+ loops, loop-owning threads, cross-thread posts and bounded queues.
+ One dynamic library on purpose, so a Loop reference handed across a
+ plugin boundary means the same loop state on every side.
+
+Package: libphi-runtime-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, libphi-runtime0 (= ${binary:Version})
+Description: PHI runtime library development files
+ Headers and CMake config for building against the phi runtime.

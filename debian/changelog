@@ -1,0 +1,10 @@
+phi-runtime (0.1.0-1) unstable; urgency=medium
+
+  * The runtime leaves phi-core (6e-a): loops, loop-owning threads,
+    cross-thread posts and bounded queues as libphi-runtime.so.0, one
+    dynamic library so a Loop& handed across a plugin boundary means the
+    same loop state on every side. Namespace phi::runtime, with a
+    transition alias for phicore::runtime until 6d. SONAME deliberately
+    unstable: every breaking cut bumps it.
+
+ -- Marius Schumacher <marius.schumacher@phisys.com>  Wed, 02 Sep 2026 14:40:00 +0200

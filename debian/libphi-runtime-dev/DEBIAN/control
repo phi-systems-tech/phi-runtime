@@ -1,0 +1,12 @@
+Package: libphi-runtime-dev
+Source: phi-runtime
+Version: 0.1.0-1
+Architecture: arm64
+Maintainer: Marius Schumacher <marius.schumacher@phisys.com>
+Installed-Size: 48
+Depends: libphi-runtime0 (= 0.1.0-1)
+Section: libdevel
+Priority: optional
+Homepage: https://github.com/phi-systems-tech/phi-runtime
+Description: PHI runtime library development files
+ Headers and CMake config for building against the phi runtime.
