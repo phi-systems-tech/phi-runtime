@@ -115,6 +115,48 @@ void testARepeatingTimerTicksUntilReset(const LoopFactory &make)
     CHECK(!ticker);
 }
 
+void testACallbackOutlivesTheHandleItRetires(const LoopFactory &make)
+{
+    // A callback that resets its own handle keeps running afterwards - a poll
+    // that has decided it is finished still has to report that. The loop used
+    // to destroy the running std::function inside reset(), so everything the
+    // callback had captured was freed under its feet. It did not crash, which
+    // is the only reason it lasted; the two re-entrancy tests above walked
+    // straight into it the first time this suite ran under AddressSanitizer.
+    //
+    // The capture is deliberately too large for std::function's small-object
+    // buffer, so the closure is a heap block and the read after the reset is a
+    // read of freed memory rather than of a stack slot that happens to survive.
+    auto loop = make();
+    struct Bulky {
+        std::string tag = "the callback still has its captures";
+        std::vector<int> ballast = std::vector<int>(64, 7);
+    };
+    Bulky bulky;
+    int ticks = 0;
+    bool tagIntact = false;
+    bool ballastIntact = false;
+
+    Timer ticker;
+    ticker = loop->timerEvery(std::chrono::milliseconds(5), [&loop, &ticker, &ticks,
+                                                            bulky, &tagIntact,
+                                                            &ballastIntact]() {
+        if (++ticks < 2)
+            return;
+        ticker.reset();
+        tagIntact = bulky.tag == "the callback still has its captures";
+        ballastIntact = bulky.ballast.size() == 64 && bulky.ballast.back() == 7;
+        loop->stop();
+    });
+    Timer watchdog = loop->timerAfter(kWatchdog, [&]() { loop->stop(); });
+    loop->run();
+
+    CHECK(ticks == 2);
+    CHECK(!ticker);
+    CHECK(tagIntact);
+    CHECK(ballastIntact);
+}
+
 void testFdWatchesDeliverReadAndWrite(const LoopFactory &make)
 {
     auto loop = make();
@@ -321,6 +363,7 @@ void runLoopSuite(const char *label, const LoopFactory &make)
     testPostedWorkRunsInOrderOnTheLoopThread(make);
     testTimersFireByDeadlineAndAResetOneStaysQuiet(make);
     testARepeatingTimerTicksUntilReset(make);
+    testACallbackOutlivesTheHandleItRetires(make);
     testFdWatchesDeliverReadAndWrite(make);
     testADisabledWatchStaysSilentUntilEnabled(make);
     testADisabledWatchDoesNotSpinTheLoop(make);

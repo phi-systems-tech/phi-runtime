@@ -106,7 +106,14 @@ void EpollLoop::fireDueTimers()
                 next = now + it->second.interval;
             it->second.deadline = next;
             m_deadlines.push({next, due.id});
-            it->second.callback();
+            // Moved out for the same reason as an fd callback: a repeating
+            // timer that resets itself - a poll that has decided it is done -
+            // erases the entry the running std::function lives in.
+            Callback callback = std::move(it->second.callback);
+            callback();
+            auto again = m_timers.find(due.id);
+            if (again != m_timers.end() && !again->second.callback)
+                again->second.callback = std::move(callback);
         } else {
             Callback callback = std::move(it->second.callback);
             m_timers.erase(it);
@@ -132,8 +139,26 @@ void EpollLoop::deliverFdEvent(int fd, std::uint32_t ready, FdEvent event)
     const std::uint32_t wanted = event == FdEvent::Read
                                      ? (EPOLLIN | EPOLLERR | EPOLLHUP)
                                      : (EPOLLOUT | EPOLLERR | EPOLLHUP);
-    if ((ready & wanted) != 0)
-        it->second.callback();
+    if ((ready & wanted) == 0)
+        return;
+
+    // Held on the stack for the duration of the call. Resetting a watch from
+    // inside its own callback is the ordinary thing to do - a socket class
+    // closes its descriptor there - and removeFdWatch() erases the map node,
+    // which destroys the std::function that is running. The closure it holds
+    // dies with it, so the callback reads freed memory the moment it touches
+    // anything it captured. Nothing crashed, which is why this stood; the
+    // suite's own re-entrancy tests reported it the first time they ran under
+    // AddressSanitizer.
+    Callback callback = std::move(it->second.callback);
+    callback();
+
+    // Put it back unless the callback retired the watch. Ids are never reused,
+    // so a found entry is the same watch and an empty callback means nobody
+    // else has filled it in.
+    auto again = m_watches.find(id);
+    if (again != m_watches.end() && !again->second.callback)
+        again->second.callback = std::move(callback);
 }
 
 void EpollLoop::run()
