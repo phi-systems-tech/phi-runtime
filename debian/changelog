@@ -1,21 +1,12 @@
-phi-runtime (0.2.0~git202609022114.a77b3c2-1) unstable; urgency=medium
+phi-runtime (0.2.1~git202609080954.89ef738-1) trixie; urgency=medium
 
-  * The string vocabulary joins the library (6d string sweep):
-    header-only phi::str (str.h) and phi::maps (maputil.h) - the
-    QString/QHash idioms phi-core and the adapter ports translate onto,
-    pinned by str_tests. The transitional phicore::runtime alias is
-    removed from every header; consumers say phi::runtime. API addition
-    plus source-breaking alias removal, no ABI change: SOVERSION stays 0.
+  * A callback outlives the handle it retires. Resetting a timer or an fd
+    watch from inside its own callback - a socket class closing its
+    descriptor, a repeating poll stopping itself - erased the map node the
+    running std::function lived in, freeing the closure under its feet. It
+    never crashed, which is why it lasted; AddressSanitizer reports it on
+    this suite's own re-entrancy tests. The callback is held on the stack for
+    the duration of the call. No allocation per event, no layout change.
 
- -- Marius Schumacher <marius.schumacher@phisys.com>  Wed, 02 Sep 2026 21:14:22 +0200
+ -- Marius Schumacher <marius.schumacher@phisys.com>  Tue, 08 Sep 2026 09:54:48 +0200
 
-phi-runtime (0.1.0-1) unstable; urgency=medium
-
-  * The runtime leaves phi-core (6e-a): loops, loop-owning threads,
-    cross-thread posts and bounded queues as libphi-runtime.so.0, one
-    dynamic library so a Loop& handed across a plugin boundary means the
-    same loop state on every side. Namespace phi::runtime, with a
-    transition alias for phicore::runtime until 6d. SONAME deliberately
-    unstable: every breaking cut bumps it.
-
- -- Marius Schumacher <marius.schumacher@phisys.com>  Wed, 02 Sep 2026 14:40:00 +0200
