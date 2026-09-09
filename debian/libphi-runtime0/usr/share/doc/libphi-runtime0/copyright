@@ -1,9 +1,0 @@
-Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
-Upstream-Name: phi-adapter-sdk
-Upstream-Contact: Marius Schumacher <marius.schumacher@phisys.com>
-Source: https://github.com/phi-systems-tech/phi-adapter-sdk
-
-Files: *
-Copyright: 2025-2026 Marius Schumacher
-License: GPL-3
- Comment: Proprietary project license not listed in this repository.

@@ -1,0 +1,18 @@
+/build/
+/build-dev/
+/.idea/
+/.vscode/
+/.DS_Store
+CMakeUserPresets.json
+
+# Common build artifacts
+/obj-*/
+debian/tmp/
+debian/.debhelper/
+debian/debhelper-build-stamp
+debian/files
+debian/*.debhelper
+debian/*.debhelper.log
+debian/*.substvars
+debian/libphi-runtime0/
+debian/libphi-runtime-dev/

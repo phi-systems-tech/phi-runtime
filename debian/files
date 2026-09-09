@@ -1,4 +1,0 @@
-libphi-runtime-dev_0.1.0-1_arm64.deb libdevel optional
-libphi-runtime0-dbgsym_0.1.0-1_arm64.deb debug optional automatic=yes
-libphi-runtime0_0.1.0-1_arm64.deb libs optional
-phi-runtime_0.1.0-1_arm64.buildinfo libs optional
