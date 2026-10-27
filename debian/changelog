@@ -1,3 +1,10 @@
+phi-runtime (0.2.1~git202610272105.78342c9-1) trixie; urgency=medium
+
+  * mqtt: one MQTT client on the loop, libphi-runtime-mqtt (new
+    packages libphi-runtime-mqtt0 and -dev).
+
+ -- Marius Schumacher <marius.schumacher@phisys.com>  Tue, 27 Oct 2026 21:05:52 +0100
+
 phi-runtime (0.2.1~git202610271355.c367236-1) trixie; urgency=medium
 
   * str: macKey and normalizedMac, the one MAC normaliser (six copies
