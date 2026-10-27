@@ -17,3 +17,14 @@ if(TARGET phi_runtime_mqtt)
     add_test(NAME mqtt_tests COMMAND mqtt_tests)
     set_tests_properties(mqtt_tests PROPERTIES SKIP_RETURN_CODE 77)
 endif()
+
+# The same client against a broker that refuses, says nothing or goes away:
+# a few hundred lines of MQTT 3.1.1 in the test, no mosquitto needed.
+if(TARGET phi_runtime_mqtt)
+    find_package(Threads REQUIRED)
+    add_executable(mqtt_fakebroker_tests mqtt_fakebroker_tests.cpp)
+    target_link_libraries(mqtt_fakebroker_tests PRIVATE phi::runtime_mqtt Threads::Threads)
+    target_include_directories(mqtt_fakebroker_tests PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+    add_test(NAME mqtt_fakebroker_tests COMMAND mqtt_fakebroker_tests)
+    set_tests_properties(mqtt_fakebroker_tests PROPERTIES TIMEOUT 120)
+endif()

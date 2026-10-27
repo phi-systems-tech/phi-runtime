@@ -33,6 +33,8 @@ a consumer needs neither libmosquitto's headers nor its CMake.
     find_package(phi-runtime-mqtt CONFIG REQUIRED)
     target_link_libraries(my-adapter PRIVATE phi::runtime_mqtt)
 
+`tests/mqtt_fakebroker_tests.cpp` runs it against a broker of its own that
+refuses, says nothing or goes away (from phi-adapter-z2m);
 `tests/mqtt_tests.cpp` runs against a mosquitto it starts on a free port
 (publish, subscribe, retained, will, clean disconnect, broker gone) and is
 skipped where `/usr/sbin/mosquitto` is missing, as in a package build.
