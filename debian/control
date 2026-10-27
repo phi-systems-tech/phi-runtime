@@ -2,7 +2,7 @@ Source: phi-runtime
 Section: libs
 Priority: optional
 Maintainer: Marius Schumacher <marius.schumacher@phisys.com>
-Build-Depends: debhelper-compat (= 13), cmake
+Build-Depends: debhelper-compat (= 13), cmake, pkgconf, libmosquitto-dev
 Standards-Version: 4.7.0
 Rules-Requires-Root: no
 Homepage: https://github.com/phi-systems-tech/phi-runtime
@@ -22,3 +22,20 @@ Architecture: any
 Depends: ${misc:Depends}, libphi-runtime0 (= ${binary:Version})
 Description: PHI runtime library development files
  Headers and CMake config for building against the phi runtime.
+
+Package: libphi-runtime-mqtt0
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: PHI runtime MQTT client
+ An MQTT client driven by the phi runtime loop: libmosquitto on the
+ loop's thread, with TLS, a last will and disconnect reasons a person
+ can read. A library of its own, so only what talks to a broker pulls
+ in libmosquitto.
+
+Package: libphi-runtime-mqtt-dev
+Section: libdevel
+Architecture: any
+Depends: ${misc:Depends}, libphi-runtime-mqtt0 (= ${binary:Version}), libphi-runtime-dev (= ${binary:Version})
+Description: PHI runtime MQTT client development files
+ Header (phi/runtime/mqtt/client.h) and CMake config
+ (find_package(phi-runtime-mqtt), target phi::runtime_mqtt).

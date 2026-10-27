@@ -1,0 +1,3 @@
+usr/include/phi/runtime/mqtt
+usr/lib/*/libphi_runtime_mqtt.so
+usr/lib/*/cmake/phi-runtime-mqtt

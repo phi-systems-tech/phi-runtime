@@ -45,6 +45,23 @@ if(NOT CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(FATAL_ERROR "phi-runtime is epoll-based and currently supports Linux only")
 endif()
 
+# The MQTT client (phi/runtime/mqtt/client.h), a library of its own: only
+# what talks to a broker links libmosquitto, never the loop. Privately linked,
+# so its consumers need neither libmosquitto's headers nor its CMake.
+option(PHI_RUNTIME_BUILD_MQTT "Build libphi_runtime_mqtt (needs libmosquitto)" ON)
+if(PHI_RUNTIME_BUILD_MQTT)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(MOSQUITTO REQUIRED IMPORTED_TARGET libmosquitto)
+    add_library(phi_runtime_mqtt SHARED src/mqtt.cpp)
+    add_library(phi::runtime_mqtt ALIAS phi_runtime_mqtt)
+    set_target_properties(phi_runtime_mqtt PROPERTIES
+        EXPORT_NAME runtime_mqtt
+        VERSION ${PROJECT_VERSION}
+        SOVERSION ${PROJECT_VERSION_MAJOR}
+    )
+    target_link_libraries(phi_runtime_mqtt PUBLIC phi_runtime PRIVATE PkgConfig::MOSQUITTO)
+endif()
+
 option(PHI_RUNTIME_BUILD_TESTS "Build phi-runtime tests" ${PROJECT_IS_TOP_LEVEL})
 if(PHI_RUNTIME_BUILD_TESTS)
     enable_testing()
@@ -61,6 +78,33 @@ install(
     TARGETS phi_runtime
     EXPORT phi-runtimeTargets
 )
+
+if(PHI_RUNTIME_BUILD_MQTT)
+    set(PHI_RUNTIME_MQTT_CMAKE_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}/cmake/phi-runtime-mqtt")
+    install(TARGETS phi_runtime_mqtt EXPORT phi-runtime-mqttTargets)
+    install(
+        EXPORT phi-runtime-mqttTargets
+        FILE phi-runtime-mqttTargets.cmake
+        NAMESPACE phi::
+        DESTINATION ${PHI_RUNTIME_MQTT_CMAKE_INSTALL_DIR}
+    )
+    configure_package_config_file(
+        cmake/phi-runtime-mqttConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/phi-runtime-mqttConfig.cmake
+        INSTALL_DESTINATION ${PHI_RUNTIME_MQTT_CMAKE_INSTALL_DIR}
+    )
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/phi-runtime-mqttConfigVersion.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+    install(
+        FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/phi-runtime-mqttConfig.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/phi-runtime-mqttConfigVersion.cmake
+        DESTINATION ${PHI_RUNTIME_MQTT_CMAKE_INSTALL_DIR}
+    )
+endif()
 
 install(
     EXPORT phi-runtimeTargets
