@@ -59,6 +59,13 @@ if(PHI_RUNTIME_BUILD_MQTT)
         VERSION ${PROJECT_VERSION}
         SOVERSION ${PROJECT_VERSION_MAJOR}
     )
+    # Its own include path, not only the loop's: an installed phi-runtime
+    # found first may be one without the mqtt headers.
+    target_include_directories(phi_runtime_mqtt
+        PUBLIC
+            $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+            $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    )
     target_link_libraries(phi_runtime_mqtt PUBLIC phi_runtime PRIVATE PkgConfig::MOSQUITTO)
 endif()
 
