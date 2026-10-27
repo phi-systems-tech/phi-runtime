@@ -1,3 +1,10 @@
+phi-runtime (0.2.1~git202610271355.c367236-1) trixie; urgency=medium
+
+  * str: macKey and normalizedMac, the one MAC normaliser (six copies
+    in the SDK, fritz, core and the voice transport).
+
+ -- Marius Schumacher <marius.schumacher@phisys.com>  Tue, 27 Oct 2026 13:55:34 +0100
+
 phi-runtime (0.2.1~git202609080954.89ef738-1) trixie; urgency=medium
 
   * A callback outlives the handle it retires. Resetting a timer or an fd
