@@ -516,6 +516,43 @@ template <typename Int>
     return out;
 }
 
+// ------------------------------------------------------------ MAC addresses
+
+/// The twelve hex digits of a MAC, lowercase and without separators
+/// ("d885acbbd498"); empty when `mac` is not one. Colons, dashes and dots
+/// (Cisco style) are all separators. The form an id is made from.
+[[nodiscard]] inline std::string macKey(std::string_view mac)
+{
+    std::string hex;
+    for (const char c : trimmedView(mac)) {
+        if (c == ':' || c == '-' || c == '.')
+            continue;
+        const bool digit = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+        if (!digit || hex.size() == 12)
+            return {};
+        hex.push_back(lowerAscii(c));
+    }
+    return hex.size() == 12 ? hex : std::string();
+}
+
+/// A MAC in its canonical text form, "aa:bb:cc:dd:ee:ff"; anything that is
+/// not a MAC comes back trimmed and otherwise unchanged, so a caller can
+/// still show what it was given.
+[[nodiscard]] inline std::string normalizedMac(std::string_view mac)
+{
+    const std::string key = macKey(mac);
+    if (key.empty())
+        return trimmed(mac);
+    std::string out;
+    out.reserve(17);
+    for (std::size_t i = 0; i < key.size(); i += 2) {
+        if (!out.empty())
+            out.push_back(':');
+        out.append(key, i, 2);
+    }
+    return out;
+}
+
 } // namespace phi::str
 
 // phi-core code lives in namespace phicore and says str::...; this alias is

@@ -103,6 +103,22 @@ void testHexBase64()
     CHECK(str::fromBase64("YW55IGNhcm5hbCBwbGVhc3VyZS4=") == "any carnal pleasure.");
     CHECK(str::fromBase64("YQ==") == "a");
     CHECK(str::fromBase64(" YW\n55 ") == "any");          // lenient
+}
+
+void testMac()
+{
+    CHECK(str::macKey("D8:85:AC:BB:D4:98") == "d885acbbd498");
+    CHECK(str::macKey(" d8-85-ac-bb-d4-98 ") == "d885acbbd498");
+    CHECK(str::macKey("d885.acbb.d498") == "d885acbbd498");
+    CHECK(str::macKey("d885acbbd498") == "d885acbbd498");
+    CHECK(str::macKey("d8:85:ac:bb:d4").empty());        // too short
+    CHECK(str::macKey("d8:85:ac:bb:d4:98:00").empty());  // too long
+    CHECK(str::macKey("d8:85:ac:bb:d4:zz").empty());
+    CHECK(str::macKey("").empty());
+    CHECK(str::normalizedMac(" 00:11:22:AA:BB:CC ") == "00:11:22:aa:bb:cc");
+    CHECK(str::normalizedMac("0011.22aa.bbcc") == "00:11:22:aa:bb:cc");
+    CHECK(str::normalizedMac(" not a mac ") == "not a mac");
+    CHECK(str::normalizedMac("").empty());
     for (int i = 0; i < 256; ++i) {
         const std::string one(1, static_cast<char>(i));
         CHECK(str::fromHex(str::toHex(one)) == one);
@@ -133,6 +149,7 @@ int main()
     testNumbersAndParsing();
     testArg();
     testHexBase64();
+    testMac();
     testMaps();
     return phitest::report("str_tests");
 }
